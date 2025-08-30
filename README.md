@@ -67,6 +67,19 @@ python scripts\build_exe.py
 - ✅ 自动清理中间产物
 - ✅ zip压缩便于分发
 
+### 📦 发行版下载
+
+最新的发布版本可以在 [GitHub Releases](https://github.com/mshellc2021/douban-movie-crawler/releases) 页面下载：
+
+- **v0.0.2**: [豆瓣电影爬虫工具_v0.0.2.zip](https://github.com/mshellc2021/douban-movie-crawler/releases/download/v0.0.2/豆瓣电影爬虫工具_v0.0.2.zip)
+- **v0.0.1**: [豆瓣电影爬虫工具_v0.0.1.zip](https://github.com/mshellc2021/douban-movie-crawler/releases/download/v0.0.1/豆瓣电影爬虫工具_v0.0.1.zip)
+
+每个发布包包含：
+- 🎯 可执行程序 (.exe)
+- 📋 配置文件
+- 📖 使用说明文档
+- 🔧 源代码（供参考和学习）
+
 ## 📁 项目结构
 
 ```
