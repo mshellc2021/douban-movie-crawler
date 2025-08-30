@@ -35,29 +35,10 @@ def build_exe():
     """构建exe文件"""
     print("🚀 开始构建exe文件...")
     
-    # PyInstaller参数
+    # 使用现有的spec文件进行打包
     args = [
         sys.executable, "-m", "PyInstaller",
-        "src\\douban_gui.py",  # 主程序文件
-        "--name=豆瓣电影爬虫工具",  # 程序名称
-        "--onefile",  # 打包成单个exe文件
-        "--windowed",  # 窗口程序，不显示控制台
-        "--icon=NONE",  # 不使用图标
-        "--add-data=config.json;.",  # 包含配置文件
-        "--add-data=requirements.txt;.",  # 包含依赖文件
-        "--hidden-import=requests",  # 隐藏导入
-        "--hidden-import=tkinter",
-        "--hidden-import=json",
-        "--hidden-import=os",
-        "--hidden-import=sys",
-        "--hidden-import=time",
-        "--hidden-import=datetime",
-        "--hidden-import=threading",
-        "--hidden-import=subprocess",
-        "--hidden-import=webbrowser",
-        "--hidden-import=messagebox",
-        "--hidden-import=filedialog",
-        "--hidden-import=scrolledtext",
+        "豆瓣电影爬虫工具.spec",  # 使用spec文件
         "--clean"  # 清理临时文件
     ]
     
