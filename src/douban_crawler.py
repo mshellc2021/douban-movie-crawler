@@ -180,28 +180,65 @@ def main():
     if config is None:
         return False
     
+    # 从配置中获取爬取间隔
     crawl_interval = config.get('crawl_interval', 3600)
-    max_retries = config.get('max_retries', 3)
+    logging.info(f"爬取间隔设置为: {crawl_interval} 秒")
     
-    logging.info(f"豆瓣电影爬虫启动，爬取间隔: {crawl_interval}秒")
+    # 检查是否启用定时任务
+    enable_schedule = config.get('enable_schedule', False)
+    if enable_schedule:
+        logging.info("定时任务已启用，将按照设置的时间间隔自动重复爬取")
+    else:
+        logging.info("定时任务未启用，将执行单次爬取")
     
-    success = False
-    retries = 0
-    
-    while not success and retries < max_retries:
-        logging.info(f"开始第 {retries + 1} 次爬取尝试...")
-        success = fetch_douban_movies(config)
-        if not success:
-            retries += 1
-            if retries < max_retries:
-                logging.warning(f"爬取失败，{30}秒后重试...")
-                time.sleep(30)
-    
-    if not success:
-        logging.error("所有重试均失败")
-        return False
-    
-    return True
+    # 主爬取循环
+    while True:
+        try:
+            logging.info(f"开始爬取任务...")
+            
+            max_retries = config.get('max_retries', 3)
+            success = False
+            retries = 0
+            
+            while not success and retries < max_retries:
+                logging.info(f"开始第 {retries + 1} 次爬取尝试...")
+                success = fetch_douban_movies(config)
+                if not success:
+                    retries += 1
+                    if retries < max_retries:
+                        logging.warning(f"爬取失败，30秒后重试...")
+                        time.sleep(30)
+            
+            if not success:
+                logging.error("所有重试均失败")
+                if not enable_schedule:
+                    return False
+            else:
+                logging.info("爬取任务完成")
+            
+            # 如果未启用定时任务，执行一次后退出
+            if not enable_schedule:
+                logging.info("单次爬取完成，程序退出")
+                break
+                
+            # 如果启用定时任务，等待指定间隔后继续
+            if success:
+                logging.info(f"爬取成功，等待 {crawl_interval} 秒后进行下一次爬取...")
+            else:
+                logging.warning(f"爬取失败，等待 {crawl_interval} 秒后重试...")
+                
+            time.sleep(crawl_interval)
+            
+        except KeyboardInterrupt:
+            logging.info("用户中断程序执行")
+            break
+        except Exception as e:
+            logging.error(f"主循环发生未预期错误: {e}")
+            if not enable_schedule:
+                break
+            logging.info(f"等待 {crawl_interval} 秒后重试...")
+            time.sleep(crawl_interval)
+
 
 if __name__ == "__main__":
     try:

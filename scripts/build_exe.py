@@ -57,26 +57,41 @@ def build_exe():
                 print(f"📁 exe文件位置: {exe_path}")
                 print(f"📊 文件大小: {os.path.getsize(exe_path) / (1024*1024):.2f} MB")
                 
-                # 创建发布包目录
-                release_dir = os.path.join(os.getcwd(), "release")
-                os.makedirs(release_dir, exist_ok=True)
+                # 从VERSION文件读取版本号
+                version = "0.0.1"
+                if os.path.exists("VERSION"):
+                    with open("VERSION", "r", encoding="utf-8") as f:
+                        version = f.read().strip()
                 
-                # 复制exe文件到发布目录
-                shutil.copy2(exe_path, release_dir)
+                # 创建完整的可移植发布包
+                package_name = f"豆瓣电影爬虫工具_v{version}"
+                package_dir = os.path.join(os.getcwd(), "release", package_name)
+                os.makedirs(package_dir, exist_ok=True)
+                
+                # 复制exe文件到发布包目录
+                shutil.copy2(exe_path, package_dir)
                 
                 # 复制必要的配置文件
                 for config_file in ["config.json", "requirements.txt"]:
                     if os.path.exists(config_file):
-                        shutil.copy2(config_file, release_dir)
+                        shutil.copy2(config_file, package_dir)
+                
+                # 复制src源代码目录
+                if os.path.exists("src"):
+                    shutil.copytree("src", os.path.join(package_dir, "src"), dirs_exist_ok=True)
+                
+                # 创建必要的目录结构
+                for subdir in ["data", "exports", "images", "logs"]:
+                    os.makedirs(os.path.join(package_dir, subdir), exist_ok=True)
                 
                 # 创建说明文件
-                readme_content = """# 豆瓣电影爬虫工具
+                readme_content = f"""# 豆瓣电影爬虫工具 v{version}
 
 ## 使用说明
 
-1. 直接运行 `豆瓣电影爬虫工具.exe` 即可启动程序
-2. 程序会自动创建必要的目录结构（data/, exports/, images/, logs/）
-3. 首次使用建议先检查配置，然后开始爬取数据
+1. 解压整个文件夹到任意位置
+2. 直接运行 `豆瓣电影爬虫工具.exe` 即可启动程序
+3. 程序会自动使用包内的目录结构（data/, exports/, images/, logs/）
 
 ## 功能特点
 - 🎬 豆瓣电影数据爬取
@@ -90,17 +105,49 @@ def build_exe():
 - .NET Framework 4.5+（通常系统自带）
 - 不需要安装Python环境
 
+## 目录结构
+├── 豆瓣电影爬虫工具.exe    # 主程序
+├── config.json            # 配置文件
+├── requirements.txt       # 依赖说明
+├── src/                  # 源代码目录（Python源码）
+├── data/                 # 数据存储目录
+├── exports/              # Excel导出目录
+├── images/               # 电影封面目录
+└── logs/                 # 日志文件目录
+
 ## 注意事项
 - 确保网络连接正常
 - 首次运行可能会被Windows Defender拦截，请选择"允许运行"
 - 程序需要写入文件的权限
+- 请勿删除包内的任何目录，否则可能导致功能异常
 """
                 
-                with open(os.path.join(release_dir, "README.txt"), "w", encoding="utf-8") as f:
+                with open(os.path.join(package_dir, "README.txt"), "w", encoding="utf-8") as f:
                     f.write(readme_content)
                 
-                print(f"📦 发布包已创建在: {release_dir}")
-                print("🎉 打包完成！现在可以将release文件夹分享给其他用户")
+                # 创建zip压缩包
+                import zipfile
+                zip_path = os.path.join(os.getcwd(), "release", f"{package_name}.zip")
+                
+                with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                    for root, dirs, files in os.walk(package_dir):
+                        for file in files:
+                            file_path = os.path.join(root, file)
+                            arcname = os.path.relpath(file_path, os.path.dirname(package_dir))
+                            zipf.write(file_path, arcname)
+                        # 确保空目录也被包含
+                        for dir_name in dirs:
+                            dir_path = os.path.join(root, dir_name)
+                            if not os.listdir(dir_path):  # 如果是空目录
+                                zipf.write(dir_path, os.path.relpath(dir_path, os.path.dirname(package_dir)))
+                
+                print(f"📦 完整发布包已创建: {zip_path}")
+                print(f"📁 包内包含完整目录结构，用户解压即可使用")
+                
+                # 清理中间产物，只保留zip文件
+                shutil.rmtree(package_dir, ignore_errors=True)
+                print("🧹 已清理临时文件，只保留最终的zip发布包")
+                print("🎉 打包完成！现在可以将zip文件分享给其他用户")
                 
             return True
         else:

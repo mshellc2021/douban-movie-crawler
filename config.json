@@ -1,5 +1,5 @@
 {
-  "crawl_interval": 3600,
+  "crawl_interval": 20,
   "max_retries": 3,
   "timeout": 30,
   "count": 20,

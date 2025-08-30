@@ -1,50 +1,51 @@
 @echo off
-chcp 65001 >nul
+chcp 936 >nul
 echo.
 echo ================================
-echo   豆瓣电影爬虫工具 - 打包程序
+echo Douban Movie Crawler - Packager
 echo ================================
 echo.
 
-REM 检查Python是否安装
+REM Check if Python is installed
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ 错误: 未检测到Python，请先安装Python 3.6+
-    echo 下载地址: https://www.python.org/downloads/
+    echo ERROR: Python not found. Please install Python 3.7+
     pause
     exit /b 1
 )
 
-REM 检查pip是否可用
-python -m pip --version >nul 2>&1
+REM Check if pip is available
+pip --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ 错误: pip不可用，请检查Python安装
+    echo ERROR: pip not found. Please check Python installation
     pause
     exit /b 1
 )
 
-REM 检查主程序文件是否存在
-if not exist "douban_gui.py" (
-    echo ❌ 错误: 未找到douban_gui.py，请在项目根目录运行
+REM Check if main program exists - use relative path from script location
+if not exist "%~dp0..\src\douban_gui.py" (
+    echo ERROR: Main program not found at %~dp0..\src\douban_gui.py
+    echo Please run this script from the project root directory
     pause
     exit /b 1
 )
 
-echo ✅ 环境检查通过
-echo.
-echo 📦 开始打包过程...
-echo 这可能需要几分钟时间，请耐心等待...
+echo Environment check passed
+echo Starting packaging process...
 echo.
 
-REM 运行打包脚本
-python build_exe.py
+REM Run Python packaging script
+python scripts\build_exe.py
+
+if errorlevel 1 (
+    echo Packaging failed!
+    pause
+    exit /b 1
+)
 
 echo.
-echo 💡 打包完成！
-echo 📁 生成的exe文件在: dist\豆瓣电影爬虫工具.exe
-echo 📦 完整的发布包在: release\ 文件夹
-echo.
-echo 🎯 现在可以将release文件夹分享给其他用户使用
-echo ⚠️  注意: 首次运行可能会被Windows Defender拦截，请选择"允许运行"
+echo Packaging completed successfully!
+echo EXE file: dist\DoubanMovieCrawler.exe
+echo Release package: release\
 echo.
 pause

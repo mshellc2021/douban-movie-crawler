@@ -1,20 +1,27 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 
+block_cipher = None
+
+
 a = Analysis(
-    ['src\\douban_gui.py', 'src\\douban_crawler.py', 'src\\export_to_excel.py'],
+    ['src\\douban_gui.py'],
     pathex=[],
     binaries=[],
     datas=[('config.json', '.'), ('requirements.txt', '.')],
-    hiddenimports=['requests', 'tkinter', 'json', 'os', 'sys', 'time', 'datetime', 'threading', 'subprocess', 'webbrowser', 'messagebox', 'filedialog', 'scrolledtext'],
+    hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
     noarchive=False,
-    optimize=0,
+    optimize=2,
 )
-pyz = PYZ(a.pure)
+pyz = PYZ(a.pure, a.zipped_data,
+             cipher=block_cipher)
 
 exe = EXE(
     pyz,

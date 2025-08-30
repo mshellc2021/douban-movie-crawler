@@ -122,17 +122,27 @@ def export_douban_to_excel(use_latest_only=True, include_images=True):
     movies_data = []
     
     for item in all_items:
+        # 解析副标题信息
+        subtitle = item.get('card_subtitle', '')
+        parts = subtitle.split(' / ')
+        
+        # 提取各部分信息
+        country = parts[1] if len(parts) > 1 else ''
+        movie_type = parts[2] if len(parts) > 2 else ''
+        director = parts[3] if len(parts) > 3 else ''
+        actors = parts[4] if len(parts) > 4 else ''
+        
         # 提取关键信息
         movie_info = {
             '电影ID': item.get('id', ''),
             '电影标题': item.get('title', ''),
             '年份': item.get('year', ''),
-            '类型': item.get('type', ''),
             '评分': item.get('rating', {}).get('value', 0),
             '评分人数': item.get('rating', {}).get('count', 0),
-            '副标题': item.get('card_subtitle', ''),
-            '用户评论': item.get('comment', {}).get('comment', '') if item.get('comment') else '',
-            '评论用户': item.get('comment', {}).get('user', {}).get('name', '') if item.get('comment') and item.get('comment').get('user') else '',
+            '制片国家': country,
+            '影片类型': movie_type,
+            '导演': director,
+            '主演': actors,
             '封面链接': item.get('pic', {}).get('normal', '') if item.get('pic') else ''
         }
         movies_data.append(movie_info)
@@ -182,16 +192,14 @@ def export_douban_to_excel(use_latest_only=True, include_images=True):
                 elif isinstance(value, (int, float)) and value >= 7.0:
                     cell.font = Font(bold=True, color="F39C12")
             
-            # 为包含链接的列启用自动换行
-            if col_num == 10:  # 封面链接列
-                cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
-            else:
-                cell.alignment = Alignment(horizontal="left", vertical="center")
+            # 列启用自动换行
+            cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
     
     # 下载并插入图片（如果启用）
-    if include_images:
+    if include_images:# 下载并插入图片（如果启用）
         print("正在下载封面图片...")
         image_count = 0
+        failed_count = 0
         max_image_width = 0  # 记录最大图片宽度
         
         # 计算需要下载的图片总数
@@ -239,6 +247,7 @@ def export_douban_to_excel(use_latest_only=True, include_images=True):
                         print(f"插入图片失败 {image_url}: {e}")
                 else:
                     print(f"下载失败 {image_count + 1}/{total_images} - {image_url}")
+                    failed_count += 1
     else:
         print("跳过封面图片下载")
     
@@ -315,7 +324,8 @@ def export_douban_to_excel(use_latest_only=True, include_images=True):
     try:
         wb.save(export_path)
         print(f"导出完成 {len(movies_data)} 条数据")
-        print(f"图片插入 {image_count} 张")
+        if include_images:
+            print(f"图片插入 {image_count} 张，失败 {failed_count} 张")
         print("\n数据列包含:")
         for col in headers:
             print(f"- {col}")

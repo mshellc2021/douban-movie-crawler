@@ -21,7 +21,7 @@ class ToolTip:
         self.widget = widget
         self.text = text
         self.tip_window = None
-        self.id = None
+        self.id = self.id = None
         self.x = self.y = 0
         
         # 绑定鼠标事件
@@ -129,19 +129,25 @@ class DoubanCrawlerGUI:
         self.count_var = tk.StringVar(value="20")
         self.start_var = tk.StringVar(value="0")
         self.tags_var = tk.StringVar(value="2025")
+        self.enable_schedule_var = tk.BooleanVar(value=False)  # 定时任务开关
         
         # 连接参数分组
         connection_frame = ttk.LabelFrame(control_frame, text="🔗 连接设置", padding="8")
         connection_frame.grid(row=3, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
         
-        ttk.Label(connection_frame, text="爬取间隔(秒):", font=('Microsoft YaHei', 9)).grid(row=0, column=0, sticky=tk.W, pady=3)
-        ttk.Entry(connection_frame, textvariable=self.interval_var, width=10, font=('Microsoft YaHei', 9)).grid(row=0, column=1, sticky=tk.W, pady=3, padx=(6, 0))
+        # 定时任务开关
+        ttk.Checkbutton(connection_frame, text="启用定时任务", variable=self.enable_schedule_var, 
+                       width=12).grid(row=0, column=0, sticky=tk.W, pady=3)
+        ToolTip(ttk.Frame(connection_frame), "启用定时爬取功能，将按照设置的间隔时间自动重复爬取")
         
-        ttk.Label(connection_frame, text="重试次数:", font=('Microsoft YaHei', 9)).grid(row=1, column=0, sticky=tk.W, pady=3)
-        ttk.Entry(connection_frame, textvariable=self.retries_var, width=10, font=('Microsoft YaHei', 9)).grid(row=1, column=1, sticky=tk.W, pady=3, padx=(6, 0))
+        ttk.Label(connection_frame, text="爬取间隔(秒):", font=('Microsoft YaHei', 9)).grid(row=1, column=0, sticky=tk.W, pady=3)
+        ttk.Entry(connection_frame, textvariable=self.interval_var, width=10, font=('Microsoft YaHei', 9)).grid(row=1, column=1, sticky=tk.W, pady=3, padx=(6, 0))
         
-        ttk.Label(connection_frame, text="超时时间(秒):", font=('Microsoft YaHei', 9)).grid(row=2, column=0, sticky=tk.W, pady=3)
-        ttk.Entry(connection_frame, textvariable=self.timeout_var, width=10, font=('Microsoft YaHei', 9)).grid(row=2, column=1, sticky=tk.W, pady=3, padx=(6, 0))
+        ttk.Label(connection_frame, text="重试次数:", font=('Microsoft YaHei', 9)).grid(row=2, column=0, sticky=tk.W, pady=3)
+        ttk.Entry(connection_frame, textvariable=self.retries_var, width=10, font=('Microsoft YaHei', 9)).grid(row=2, column=1, sticky=tk.W, pady=3, padx=(6, 0))
+        
+        ttk.Label(connection_frame, text="超时时间(秒):", font=('Microsoft YaHei', 9)).grid(row=3, column=0, sticky=tk.W, pady=3)
+        ttk.Entry(connection_frame, textvariable=self.timeout_var, width=10, font=('Microsoft YaHei', 9)).grid(row=3, column=1, sticky=tk.W, pady=3, padx=(6, 0))
         
         # 爬虫参数分组
         crawler_frame = ttk.LabelFrame(control_frame, text="🎯 爬虫参数", padding="8")
@@ -171,7 +177,7 @@ class DoubanCrawlerGUI:
         button_frame = ttk.Frame(control_frame)
         button_frame.grid(row=5, column=0, columnspan=2, pady=(8, 15))
         
-        # 第一行按钮
+        # 第一行按钮 - 核心操作
         self.start_btn = ttk.Button(button_frame, text="🚀 启动", command=self.start_crawler, width=10)
         self.start_btn.grid(row=0, column=0, padx=2, pady=2)
         ToolTip(self.start_btn, "启动豆瓣电影数据爬虫")
@@ -184,7 +190,7 @@ class DoubanCrawlerGUI:
         self.export_btn.grid(row=0, column=2, padx=2, pady=2)
         ToolTip(self.export_btn, "将爬取的数据导出到Excel文件")
         
-        # 第二行按钮
+        # 第二行按钮 - 目录访问
         self.open_data_btn = ttk.Button(button_frame, text="📁 数据", command=self.open_data_dir, width=10)
         self.open_data_btn.grid(row=1, column=0, padx=2, pady=2)
         ToolTip(self.open_data_btn, "打开数据文件目录")
@@ -193,15 +199,19 @@ class DoubanCrawlerGUI:
         self.open_excel_btn.grid(row=1, column=1, padx=2, pady=2)
         ToolTip(self.open_excel_btn, "打开Excel导出文件目录")
         
-        # 下载高清封面按钮
+        self.open_images_btn = ttk.Button(button_frame, text="🖼️ 封面", command=self.open_images_dir, width=10)
+        self.open_images_btn.grid(row=1, column=2, padx=2, pady=2)
+        ToolTip(self.open_images_btn, "打开封面图片目录")
+        
+        # 第三行按钮 - 图片相关功能
         self.download_covers_btn = ttk.Button(button_frame, text="下载封面", command=self.download_high_res_covers, width=10)
-        self.download_covers_btn.grid(row=1, column=2, padx=2, pady=2)
+        self.download_covers_btn.grid(row=2, column=0, padx=2, pady=2)
         ToolTip(self.download_covers_btn, "批量下载高清电影封面到images目录")
         
         # 导出选项复选框
         self.include_images_var = tk.BooleanVar(value=True)
         ttk.Checkbutton(button_frame, text="导出包含图片", variable=self.include_images_var, 
-                       width=10).grid(row=2, column=0, padx=2, pady=2)
+                       width=10).grid(row=2, column=1, padx=2, pady=2)
         
 
         
@@ -242,9 +252,6 @@ class DoubanCrawlerGUI:
         status_label = ttk.Label(status_container, textvariable=self.status_var, 
                                font=('Microsoft YaHei', 10), width=15)
         status_label.pack(side=tk.LEFT, padx=(10, 5))
-        
-        # 分隔线
-        ttk.Separator(status_container, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
         
         # 分隔线
         ttk.Separator(status_container, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
@@ -301,6 +308,7 @@ class DoubanCrawlerGUI:
         self.crawler_process = None
         self.is_running = False
         self.log_file = None
+        self.after_ids = []  # 存储定时任务的after回调ID
         
         self.load_config()
         self.update_stats()
@@ -470,71 +478,38 @@ class DoubanCrawlerGUI:
     def update_status_bar(self):
         """更新状态栏信息"""
         try:
+            # 检查psutil是否可用
+            try:
+                import psutil
+                memory = psutil.virtual_memory()
+                memory_usage = f"内存使用: {memory.percent}%"
+                
+                # 获取当前进程内存使用
+                process = psutil.Process()
+                memory_info = process.memory_info()
+                memory_mb = memory_info.rss / 1024 / 1024
+                self.memory_var.set(f"💾 内存: {memory_mb:.1f} MB")
+                
+            except ImportError:
+                # psutil不可用，使用简化版本
+                memory_usage = "内存: 运行中"
+                self.memory_var.set("💾 内存: 运行中")
+            except Exception:
+                memory_usage = "内存: N/A"
+                self.memory_var.set("💾 内存: N/A")
             
-            # 更新内存使用情况（使用备用方法）- 降低更新频率
-            current_time_seconds = time.time()
-            if not hasattr(self, '_last_memory_update') or current_time_seconds - self._last_memory_update > 5:
-                try:
-                    import psutil
-                    process = psutil.Process()
-                    memory_info = process.memory_info()
-                    memory_mb = memory_info.rss / 1024 / 1024
-                    self.memory_var.set(f"💾 内存: {memory_mb:.1f} MB")
-                except ImportError:
-                    # psutil不可用，使用简化版本
-                    self.memory_var.set("💾 内存: 运行中")
-                except Exception:
-                    self.memory_var.set("💾 内存: N/A")
-                self._last_memory_update = current_time_seconds
+            # 获取当前时间
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
-            # 更新数据文件统计 - 降低更新频率
-            if not hasattr(self, '_last_data_update') or current_time_seconds - self._last_data_update > 10:
-                data_dir = 'data'
-                if os.path.exists(data_dir):
-                    json_files = [f for f in os.listdir(data_dir) if f.endswith('.json')]
-                    self.data_stats_var.set(f"📊 数据: {len(json_files)} 个")
-                else:
-                    self.data_stats_var.set("📊 数据: 0 个")
-                self._last_data_update = current_time_seconds
-                
-            # 更新Excel文件统计 - 降低更新频率
-            if not hasattr(self, '_last_excel_update') or current_time_seconds - self._last_excel_update > 10:
-                exports_dir = 'exports'
-                if os.path.exists(exports_dir):
-                    excel_files = [f for f in os.listdir(exports_dir) if f.endswith('.xlsx')]
-                    self.excel_stats_var.set(f"📋 Excel: {len(excel_files)} 个")
-                else:
-                    self.excel_stats_var.set("📋 Excel: 0 个")
-                self._last_excel_update = current_time_seconds
-                
-            # 更新最后更新时间 - 降低更新频率
-            if not hasattr(self, '_last_update_update') or current_time_seconds - self._last_update_update > 30:
-                data_dir = 'data'
-                latest_time = 0
-                
-                if os.path.exists(data_dir):
-                    # 找到最新的数据文件
-                    for entry in os.scandir(data_dir):
-                        if entry.is_file() and entry.name.endswith('.json'):
-                            file_time = entry.stat().st_mtime
-                            if file_time > latest_time:
-                                latest_time = file_time
-                
-                # 更新最后更新时间显示
-                if latest_time > 0:
-                    last_update_time = datetime.fromtimestamp(latest_time).strftime('%Y-%m-%d %H:%M:%S')
-                    self.last_update_var.set(f"📅 更新: {last_update_time}")
-                else:
-                    self.last_update_var.set("📅 更新: 从未")
-                
-                self._last_update_update = current_time_seconds
-                
+            # 更新内存信息，但不覆盖状态显示
+            # 状态栏主状态由其他方法控制，这里只更新内存和时间信息
+            
         except Exception as e:
-            # 异常处理
+            # 异常处理，避免无限递归
             pass
-            
-        # 2秒后再次更新（降低更新频率）
-        self.root.after(2000, self.update_status_bar)
+        
+        # 30秒后再次更新（大幅降低更新频率）
+        self.root.after(30000, self.update_status_bar)
     
     def _process_long_urls(self, message):
         """处理消息中的长链接，自动添加换行符"""
@@ -571,6 +546,12 @@ class DoubanCrawlerGUI:
         if not self.save_config():
             return
         
+        # 检查是否启用定时任务
+        if self.enable_schedule_var.get():
+            self.log("⏰ 定时任务已启用，将按照设定间隔自动爬取", "INFO")
+        else:
+            self.log("🚀 启动单次爬虫任务", "INFO")
+        
         def run_crawler():
             self.is_running = True
             self.start_btn.config(state=tk.DISABLED)
@@ -591,59 +572,69 @@ class DoubanCrawlerGUI:
                 
                 # 实时输出标准输出
                 def read_stdout():
-                    while self.is_running:
+                    while self.is_running and self.crawler_process:
                         try:
                             # 读取二进制数据
                             raw_line = self.crawler_process.stdout.readline()
-                            if raw_line:
-                                # 解码为UTF-8，尝试多种解码方式
+                            if not raw_line:
+                                # 检查进程是否已经结束
+                                if self.crawler_process.poll() is not None:
+                                    break
+                                continue
+                            # 解码为UTF-8，尝试多种解码方式
+                            try:
+                                line = raw_line.decode('utf-8').strip()
+                            except UnicodeDecodeError:
+                                # 如果UTF-8失败，尝试GBK编码（Windows中文环境）
                                 try:
-                                    line = raw_line.decode('utf-8').strip()
+                                    line = raw_line.decode('gbk').strip()
                                 except UnicodeDecodeError:
-                                    # 如果UTF-8失败，尝试GBK编码（Windows中文环境）
-                                    try:
-                                        line = raw_line.decode('gbk').strip()
-                                    except UnicodeDecodeError:
-                                        # 如果都失败，使用忽略错误的方式
-                                        line = raw_line.decode('utf-8', errors='ignore').strip()
-                                if line:
-                                    self.root.after(0, self.log, line, "INFO")
-                            else:
-                                break
+                                    # 如果都失败，使用忽略错误的方式
+                                    line = raw_line.decode('utf-8', errors='ignore').strip()
+                            if line:
+                                self.root.after(0, self.log, line, "INFO")
                         except Exception as e:
+                            # 如果发生异常，检查进程是否还在运行
+                            if not self.is_running or self.crawler_process is None or self.crawler_process.poll() is not None:
+                                break
                             self.root.after(0, self.log, f"读取输出错误: {e}", "ERROR")
                             break
                 
                 # 实时输出标准错误
                 def read_stderr():
-                    while self.is_running:
+                    while self.is_running and self.crawler_process:
                         try:
                             # 读取二进制数据
                             raw_line = self.crawler_process.stderr.readline()
-                            if raw_line:
-                                # 解码为UTF-8，尝试多种解码方式
+                            if not raw_line:
+                                # 检查进程是否已经结束
+                                if self.crawler_process.poll() is not None:
+                                    break
+                                continue
+                            # 解码为UTF-8，尝试多种解码方式
+                            try:
+                                line = raw_line.decode('utf-8').strip()
+                            except UnicodeDecodeError:
+                                # 如果UTF-8失败，尝试GBK编码（Windows中文环境）
                                 try:
-                                    line = raw_line.decode('utf-8').strip()
+                                    line = raw_line.decode('gbk').strip()
                                 except UnicodeDecodeError:
-                                    # 如果UTF-8失败，尝试GBK编码（Windows中文环境）
-                                    try:
-                                        line = raw_line.decode('gbk').strip()
-                                    except UnicodeDecodeError:
-                                        # 如果都失败，使用忽略错误的方式
-                                        line = raw_line.decode('utf-8', errors='ignore').strip()
-                                if line:
-                                    # 解析日志级别，根据实际内容确定日志等级
-                                    log_level = "ERROR"  # 默认设为ERROR
-                                    if "INFO" in line:
-                                        log_level = "INFO"
-                                    elif "WARNING" in line:
-                                        log_level = "WARNING"
-                                    elif "ERROR" in line:
-                                        log_level = "ERROR"
-                                    self.root.after(0, self.log, line, log_level)
-                            else:
-                                break
+                                    # 如果都失败，使用忽略错误的方式
+                                    line = raw_line.decode('utf-8', errors='ignore').strip()
+                            if line:
+                                # 解析日志级别，根据实际内容确定日志等级
+                                log_level = "ERROR"  # 默认设为ERROR
+                                if "INFO" in line:
+                                    log_level = "INFO"
+                                elif "WARNING" in line:
+                                    log_level = "WARNING"
+                                elif "ERROR" in line:
+                                    log_level = "ERROR"
+                                self.root.after(0, self.log, line, log_level)
                         except Exception as e:
+                            # 如果发生异常，检查进程是否还在运行
+                            if not self.is_running or self.crawler_process is None or self.crawler_process.poll() is not None:
+                                break
                             self.root.after(0, self.log, f"读取错误输出错误: {e}", "ERROR")
                             break
                 
@@ -658,13 +649,175 @@ class DoubanCrawlerGUI:
                 
                 if returncode == 0:
                     self.log("✅ 爬虫任务完成", "SUCCESS")
+                    # 如果启用了定时任务，等待指定间隔后重新启动
+                    if self.enable_schedule_var.get() and self.is_running:
+                        interval = int(self.interval_var.get())
+                        self.log(f"⏰ 等待 {interval} 秒后重新启动爬虫...", "INFO")
+                        # 使用after方法代替time.sleep，避免GUI卡死
+                        after_id = self.root.after(interval * 1000, self._schedule_restart)
+                        self.after_ids.append(after_id)
                 else:
                     self.log(f"❌ 爬虫异常退出，返回码: {returncode}", "ERROR")
+                    # 如果启用了定时任务，等待指定间隔后重新启动
+                    if self.enable_schedule_var.get() and self.is_running:
+                        interval = int(self.interval_var.get())
+                        self.log(f"⏰ 等待 {interval} 秒后重新启动爬虫...", "INFO")
+                        # 使用after方法代替time.sleep，避免GUI卡死
+                        after_id = self.root.after(interval * 1000, self._schedule_restart)
+                        self.after_ids.append(after_id)
                 
             except Exception as e:
                 self.root.after(0, self.log, f"❌ 爬虫运行错误: {e}", "ERROR")
+                # 如果启用了定时任务，等待指定间隔后重新启动
+                if self.enable_schedule_var.get() and self.is_running:
+                    interval = int(self.interval_var.get())
+                    self.log(f"⏰ 等待 {interval} 秒后重新启动爬虫...", "INFO")
+                    # 使用after方法代替time.sleep，避免GUI卡死
+                    after_id = self.root.after(interval * 1000, self._schedule_restart)
+                    self.after_ids.append(after_id)
             finally:
-                self.root.after(0, self.stop_crawler_ui)
+                if not self.enable_schedule_var.get():
+                    self.root.after(0, self.stop_crawler_ui)
+                self.root.after(0, self.update_stats)
+        
+        # 在新线程中运行爬虫
+        threading.Thread(target=run_crawler, daemon=True).start()
+    
+    def _start_crawler_direct(self):
+        """直接启动爬虫（用于定时任务重启，不检查is_running状态）"""
+        # 保存配置，如果失败则返回
+        if not self.save_config():
+            return
+        
+        # 检查是否启用定时任务
+        if self.enable_schedule_var.get():
+            self.log("⏰ 定时任务已启用，将按照设定间隔自动爬取", "INFO")
+        else:
+            self.log("🚀 启动单次爬虫任务", "INFO")
+        
+        def run_crawler():
+            self.is_running = True
+            self.start_btn.config(state=tk.DISABLED)
+            self.stop_btn.config(state=tk.NORMAL)
+            self.export_btn.config(state=tk.DISABLED)
+            self.open_data_btn.config(state=tk.DISABLED)
+            
+            self.log("🚀 正在启动爬虫...", "INFO")
+            
+            try:
+                # 使用subprocess运行爬虫（二进制模式读取，避免解码阻塞）
+                self.crawler_process = subprocess.Popen(
+                    ['python', 'src\\douban_crawler.py'],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    cwd=os.getcwd()
+                )
+                
+                # 实时输出标准输出
+                def read_stdout():
+                    while self.is_running and self.crawler_process:
+                        try:
+                            # 读取二进制数据
+                            raw_line = self.crawler_process.stdout.readline()
+                            if not raw_line:
+                                # 检查进程是否已经结束
+                                if self.crawler_process.poll() is not None:
+                                    break
+                                continue
+                            # 解码为UTF-8，尝试多种解码方式
+                            try:
+                                line = raw_line.decode('utf-8').strip()
+                            except UnicodeDecodeError:
+                                # 如果UTF-8失败，尝试GBK编码（Windows中文环境）
+                                try:
+                                    line = raw_line.decode('gbk').strip()
+                                except UnicodeDecodeError:
+                                    # 如果都失败，使用忽略错误的方式
+                                    line = raw_line.decode('utf-8', errors='ignore').strip()
+                            if line:
+                                self.root.after(0, self.log, line, "INFO")
+                        except Exception as e:
+                            # 如果发生异常，检查进程是否还在运行
+                            if not self.is_running or self.crawler_process is None or self.crawler_process.poll() is not None:
+                                break
+                            self.root.after(0, self.log, f"读取输出错误: {e}", "ERROR")
+                            break
+                
+                # 实时输出标准错误
+                def read_stderr():
+                    while self.is_running and self.crawler_process:
+                        try:
+                            # 读取二进制数据
+                            raw_line = self.crawler_process.stderr.readline()
+                            if not raw_line:
+                                # 检查进程是否已经结束
+                                if self.crawler_process.poll() is not None:
+                                    break
+                                continue
+                            # 解码为UTF-8，尝试多种解码方式
+                            try:
+                                line = raw_line.decode('utf-8').strip()
+                            except UnicodeDecodeError:
+                                # 如果UTF-8失败，尝试GBK编码（Windows中文环境）
+                                try:
+                                    line = raw_line.decode('gbk').strip()
+                                except UnicodeDecodeError:
+                                    # 如果都失败，使用忽略错误的方式
+                                    line = raw_line.decode('utf-8', errors='ignore').strip()
+                            if line:
+                                # 解析日志级别，根据实际内容确定日志等级
+                                log_level = "ERROR"  # 默认设为ERROR
+                                if "INFO" in line:
+                                    log_level = "INFO"
+                                elif "WARNING" in line:
+                                    log_level = "WARNING"
+                                elif "ERROR" in line:
+                                    log_level = "ERROR"
+                                self.root.after(0, self.log, line, log_level)
+                        except Exception as e:
+                            # 如果发生异常，检查进程是否还在运行
+                            if not self.is_running or self.crawler_process is None or self.crawler_process.poll() is not None:
+                                break
+                            self.root.after(0, self.log, f"读取错误输出错误: {e}", "ERROR")
+                            break
+                
+                # 启动读取线程
+                stdout_thread = threading.Thread(target=read_stdout, daemon=True)
+                stderr_thread = threading.Thread(target=read_stderr, daemon=True)
+                stdout_thread.start()
+                stderr_thread.start()
+                
+                # 等待进程结束并获取返回码
+                returncode = self.crawler_process.wait()
+                
+                if returncode == 0:
+                    self.log("✅ 爬虫任务完成", "SUCCESS")
+                    # 如果启用了定时任务，等待指定间隔后重新启动
+                    if self.enable_schedule_var.get() and self.is_running:
+                        interval = int(self.interval_var.get())
+                        self.log(f"⏰ 等待 {interval} 秒后重新启动爬虫...", "INFO")
+                        # 使用after方法代替time.sleep，避免GUI卡死
+                        self.root.after(interval * 1000, self._schedule_restart)
+                else:
+                    self.log(f"❌ 爬虫异常退出，返回码: {returncode}", "ERROR")
+                    # 如果启用了定时任务，等待指定间隔后重新启动
+                    if self.enable_schedule_var.get() and self.is_running:
+                        interval = int(self.interval_var.get())
+                        self.log(f"⏰ 等待 {interval} 秒后重新启动爬虫...", "INFO")
+                        # 使用after方法代替time.sleep，避免GUI卡死
+                        self.root.after(interval * 1000, self._schedule_restart)
+                
+            except Exception as e:
+                self.root.after(0, self.log, f"❌ 爬虫运行错误: {e}", "ERROR")
+                # 如果启用了定时任务，等待指定间隔后重新启动
+                if self.enable_schedule_var.get() and self.is_running:
+                    interval = int(self.interval_var.get())
+                    self.log(f"⏰ 等待 {interval} 秒后重新启动爬虫...", "INFO")
+                    # 使用after方法代替time.sleep，避免GUI卡死
+                    self.root.after(interval * 1000, self._schedule_restart)
+            finally:
+                if not self.enable_schedule_var.get():
+                    self.root.after(0, self.stop_crawler_ui)
                 self.root.after(0, self.update_stats)
         
         # 在新线程中运行爬虫
@@ -678,6 +831,13 @@ class DoubanCrawlerGUI:
         
         self.log("🛑 正在停止爬虫...", "INFO")
         self.is_running = False
+        
+        # 如果启用了定时任务，取消所有待定的定时重启
+        if self.enable_schedule_var.get():
+            # 取消所有after回调（包括可能的定时重启）
+            for after_id in self.after_ids:
+                self.root.after_cancel(after_id)
+            self.after_ids.clear()
         
         if self.crawler_process:
             try:
@@ -697,6 +857,14 @@ class DoubanCrawlerGUI:
         self.is_running = False
         self.crawler_process = None
         self.log("🟢 爬虫已停止", "INFO")
+    
+    def _schedule_restart(self):
+        """定时任务重启方法"""
+        # 检查定时任务是否仍然启用，而不是检查is_running状态
+        if self.enable_schedule_var.get():
+            # 直接启动爬虫，不检查is_running状态（因为这是定时重启）
+            after_id = self.root.after(0, self._start_crawler_direct)
+            self.after_ids.append(after_id)
     
     def export_to_excel(self):
         """导出数据到Excel"""
@@ -736,7 +904,7 @@ class DoubanCrawlerGUI:
             
             # 实时读取输出
             def read_output():
-                while True:
+                while process.poll() is None:  # 进程还在运行时读取
                     line = process.stdout.readline()
                     if not line:
                         break
@@ -746,7 +914,7 @@ class DoubanCrawlerGUI:
             
             # 实时读取错误
             def read_error():
-                while True:
+                while process.poll() is None:  # 进程还在运行时读取
                     line = process.stderr.readline()
                     if not line:
                         break
@@ -807,30 +975,49 @@ class DoubanCrawlerGUI:
         except Exception as e:
             self.log(f"❌ 打开Excel目录失败: {e}", "ERROR")
 
+    def open_images_dir(self):
+        """打开封面图片目录"""
+        try:
+            images_dir = os.path.abspath('images')
+            if os.path.exists(images_dir):
+                os.startfile(images_dir)
+                self.log("🖼️ 已打开封面图片目录", "INFO")
+            else:
+                self.log("❌ 封面图片目录不存在", "WARNING")
+                messagebox.showwarning("警告", "封面图片目录不存在，请先下载封面图片")
+        except Exception as e:
+            self.log(f"❌ 打开封面图片目录失败: {e}", "ERROR")
+
     def download_high_res_covers(self):
         """批量下载高清电影封面"""
+        # 在新线程中执行下载操作，避免阻塞GUI界面
+        threading.Thread(target=self._download_covers_thread, daemon=True).start()
+    
+    def _download_covers_thread(self):
+        """下载封面的线程函数"""
         try:
             # 创建images目录
             images_dir = 'images'
             os.makedirs(images_dir, exist_ok=True)
             
-            self.log("🖼️ 开始批量下载高清电影封面...", "INFO")
+            self.root.after(0, lambda: self.log("🖼️ 开始批量下载高清电影封面...", "INFO"))
             
             # 获取所有数据文件
             data_dir = 'data'
             if not os.path.exists(data_dir):
-                self.log("❌ 数据目录不存在，请先爬取数据", "ERROR")
-                messagebox.showerror("错误", "数据目录不存在，请先爬取数据")
+                self.root.after(0, lambda: self.log("❌ 数据目录不存在，请先爬取数据", "ERROR"))
+                self.root.after(0, lambda: messagebox.showerror("错误", "数据目录不存在，请先爬取数据"))
                 return
             
             json_files = [f for f in os.listdir(data_dir) if f.endswith('.json')]
             if not json_files:
-                self.log("❌ 没有找到数据文件", "ERROR")
-                messagebox.showerror("错误", "没有找到数据文件")
+                self.root.after(0, lambda: self.log("❌ 没有找到数据文件", "ERROR"))
+                self.root.after(0, lambda: messagebox.showerror("错误", "没有找到数据文件"))
                 return
             
             total_downloaded = 0
             total_skipped = 0
+            total_failed = 0
             
             for json_file in json_files:
                 file_path = os.path.join(data_dir, json_file)
@@ -858,7 +1045,7 @@ class DoubanCrawlerGUI:
                         
                         # 检查文件是否已存在
                         if os.path.exists(filepath):
-                            self.log(f"⏭️ 封面已存在，跳过: {filename}", "INFO")
+                            self.root.after(0, lambda f=filename: self.log(f"⏭️ 封面已存在，跳过: {f}", "INFO"))
                             total_skipped += 1
                             continue
                         
@@ -870,23 +1057,24 @@ class DoubanCrawlerGUI:
                             with open(filepath, 'wb') as img_file:
                                 img_file.write(response.content)
                             
-                            self.log(f"✅ 下载成功: {filename}", "SUCCESS")
+                            self.root.after(0, lambda f=filename: self.log(f"✅ 下载成功: {f}", "SUCCESS"))
                             total_downloaded += 1
                             
                         except Exception as e:
-                            self.log(f"❌ 下载失败 {filename}: {e}", "ERROR")
+                            self.root.after(0, lambda f=filename, e=e: self.log(f"❌ 下载失败 {f}: {e}", "ERROR"))
+                            total_failed += 1
                             
                 except Exception as e:
-                    self.log(f"❌ 处理文件 {json_file} 时出错: {e}", "ERROR")
+                    self.root.after(0, lambda f=json_file, e=e: self.log(f"❌ 处理文件 {f} 时出错: {e}", "ERROR"))
             
             # 显示下载结果
-            result_msg = f"🎉 下载完成！成功: {total_downloaded} 个，跳过: {total_skipped} 个"
-            self.log(result_msg, "SUCCESS")
-            messagebox.showinfo("完成", result_msg)
+            result_msg = f"🎉 下载完成！成功: {total_downloaded} 个，跳过: {total_skipped} 个，失败: {total_failed} 个"
+            self.root.after(0, lambda: self.log(result_msg, "SUCCESS"))
+            self.root.after(0, lambda: messagebox.showinfo("完成", result_msg))
             
         except Exception as e:
-            self.log(f"❌ 下载高清封面失败: {e}", "ERROR")
-            messagebox.showerror("错误", f"下载失败: {e}")
+            self.root.after(0, lambda e=e: self.log(f"❌ 下载高清封面失败: {e}", "ERROR"))
+            self.root.after(0, lambda e=e: messagebox.showerror("错误", f"下载失败: {e}"))
     
     def clear_log(self):
         """清空日志"""
@@ -977,7 +1165,16 @@ class DoubanCrawlerGUI:
             else:
                 size_str = f"{total_size} B"
             
-            # 统计信息已移除，不再更新显示
+            # 更新状态栏统计信息
+            self.data_stats_var.set(f"📊 数据文件: {total_files} 个 ({size_str})")
+            self.last_update_var.set(f"📅 最后更新: {datetime.fromtimestamp(latest_time).strftime('%Y-%m-%d %H:%M')}" if latest_time else "📅 最后更新: 从未")
+            
+            # 统计Excel文件
+            excel_dir = 'exports'
+            excel_files = 0
+            if os.path.exists(excel_dir):
+                excel_files = len([f for f in os.listdir(excel_dir) if f.endswith('.xlsx')])
+            self.excel_stats_var.set(f"📋 Excel文件: {excel_files} 个")
             
 
                 
@@ -1007,3 +1204,4 @@ if __name__ == "__main__":
     y = (root.winfo_screenheight() - root.winfo_height()) // 2
     root.geometry(f"+{x}+{y}")
     root.mainloop()
+
