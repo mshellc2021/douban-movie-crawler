@@ -1,6 +1,6 @@
 # 豆瓣电影数据管理工具
 
-一个功能完整的豆瓣电影数据爬取和管理GUI工具，支持定时爬取、数据导出和可视化操作。
+一个功能完整的豆瓣电影数据爬取和管理GUI工具，支持定时爬取、数据导出和可视化操作。（觉得好用的话可以点个star✨，感谢你的支持）
 
 ## ✨ 功能特性
 
@@ -18,32 +18,39 @@
 ## 📸 界面截图
 
 ### 主程序界面
+
 ![主程序界面](screenshots/main_interface.png)
 
 ### 数据爬取页面
+
 ![数据爬取页面](screenshots/data_crawling.png)
 
 ### 导出报表页面
+
 ![导出报表页面](screenshots/export_report1.png)
 ![导出报表详情](screenshots/export_report2.png)
 ![导出报表完成](screenshots/export_report3.png)
 
 ### 下载图片页面
+
 ![下载图片界面](screenshots/download_images.png)
 ![下载图片详情](screenshots/download_images2.png)
 
 ## 🚀 快速开始
 
 ### 环境要求
+
 - Python 3.6+
 - Windows 7/8/10/11 (推荐Windows 10+)
 
 ### 安装依赖
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 运行程序
+
 ```bash
 # 方法一: 使用脚本
 scripts\run_gui.bat
@@ -53,6 +60,7 @@ python src\douban_gui.py
 ```
 
 ### 打包为EXE
+
 ```bash
 # 方法一: 使用一键打包脚本
 scripts\打包.bat
@@ -62,6 +70,7 @@ python scripts\build_exe.py
 ```
 
 **打包特性**:
+
 - ✅ 自动版本控制（从VERSION文件读取版本号）
 - ✅ 完整发布包（包含exe、配置、源代码）
 - ✅ 自动清理中间产物
@@ -72,9 +81,9 @@ python scripts\build_exe.py
 最新的发布版本可以在 [GitHub Releases](https://github.com/mshellc2021/douban-movie-crawler/releases) 页面下载：
 
 - **v0.0.2**: [豆瓣电影爬虫工具_v0.0.2.zip](https://github.com/mshellc2021/douban-movie-crawler/releases/download/v0.0.2/豆瓣电影爬虫工具_v0.0.2.zip)
-- **v0.0.1**: [豆瓣电影爬虫工具_v0.0.1.zip](https://github.com/mshellc2021/douban-movie-crawler/releases/download/v0.0.1/豆瓣电影爬虫工具_v0.0.1.zip)
 
 每个发布包包含：
+
 - 🎯 可执行程序 (.exe)
 - 📋 配置文件
 - 📖 使用说明文档
@@ -121,6 +130,7 @@ douban_crawler/
 ## 📊 数据格式
 
 爬取的数据保存为JSON格式，包含完整的电影信息：
+
 - 电影标题、评分、导演、演员
 - 上映时间、类型、地区
 - 简介、海报链接
@@ -129,12 +139,14 @@ douban_crawler/
 ## 🎯 使用方法
 
 ### 图形界面操作
+
 1. 启动程序后，在主界面输入豆瓣电影链接
 2. 点击"开始爬取"按钮开始数据收集
 3. 使用"导出Excel"按钮导出数据
 4. 通过菜单访问各种功能
 
 ### 命令行操作
+
 ```bash
 # 直接运行爬虫
 python src\douban_crawler.py
@@ -146,12 +158,14 @@ python src\export_to_excel.py
 ## 🔧 开发指南
 
 ### 代码结构
+
 - `src/douban_gui.py`: 主GUI程序，基于tkinter
 - `src/douban_crawler.py`: 爬虫核心逻辑
 - `src/export_to_excel.py`: Excel导出功能
 - `tests/`: 单元测试和功能测试
 
 ### 添加新功能
+
 1. 在src目录下创建新的模块
 2. 更新GUI界面添加相应的控制
 3. 编写测试用例
@@ -159,7 +173,8 @@ python src\export_to_excel.py
 
 ## 📝 更新日志
 
-### v0.0.2 (2025-01-21)
+### v0.0.2 (2025-08-31)
+
 - ✅ **定时任务优化**: 修复定时任务重启逻辑，支持取消定时回调
 - ✅ **状态栏增强**: 实时显示数据文件统计、Excel文件数量、最后更新时间
 - ✅ **进程管理**: 完善停止爬虫功能，支持定时任务模式下的正常停止
@@ -175,6 +190,26 @@ python src\export_to_excel.py
 - ✅ 完整发布包生成（包含源代码）
 - ✅ 自动清理中间产物
 
+## 🚧 下一版本开发计划 (v0.1.0)
+
+### 🎯 核心功能增强
+- 🔄 **豆瓣电影Top500支持**: 自动爬取豆瓣电影Top250/Top500榜单数据
+- 📊 **批量导出优化**: 支持Top500数据的完整导出和统计分析
+- 🎨 **UI界面升级**: 为Top500功能添加专门的界面和控制选项
+
+### ⚡ 技术改进
+- 🚀 **性能优化**: 优化大规模数据爬取的效率和稳定性
+- 📦 **数据存储**: 改进Top500数据的存储结构和查询性能
+- 🔧 **API扩展**: 增强爬虫核心对豆瓣不同榜单的支持
+
+### 📋 预计功能
+- ✅ 支持豆瓣电影Top250完整爬取和导出
+- ✅ 支持豆瓣电影Top500完整爬取和导出  
+- ✅ 新增Top500专用界面和操作面板
+- ✅ 批量导出Top500数据到Excel
+- ✅ 数据去重和完整性校验
+- ✅ 进度显示和错误处理机制
+
 ## 🤝 贡献指南
 
 1. Fork 本项目
@@ -189,7 +224,8 @@ python src\export_to_excel.py
 
 ## 👥 作者
 
-**mshellc** 
+**mshellc**
+
 - 📧 邮箱: mshellc@foxmail.com
 - 🔧 项目开发与维护
 
@@ -215,12 +251,14 @@ python src\export_to_excel.py
 ## 📞 技术支持
 
 如果遇到问题，请：
+
 1. 查看 [docs/使用说明.md](docs/使用说明.md)
 2. 检查日志文件 `logs/douban_crawler.log`
 3. 确保网络连接正常
 4. 验证Python环境配置
 
 ---
+
 **祝您使用愉快！** 🎬
 
 ## ⭐ 支持项目
