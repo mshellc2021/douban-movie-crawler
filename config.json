@@ -1,0 +1,12 @@
+{
+  "crawl_interval": 3600,
+  "max_retries": 3,
+  "timeout": 30,
+  "count": 20,
+  "start": 0,
+  "tags": "2025",
+  "sort": "T",
+  "actual_count": 40,
+  "output_directory": "data",
+  "log_level": "INFO"
+}
