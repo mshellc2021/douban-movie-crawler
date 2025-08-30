@@ -585,7 +585,8 @@ class DoubanCrawlerGUI:
                 self.crawler_process = subprocess.Popen(
                     ['python', 'src\\douban_crawler.py'],
                     stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE
+                    stderr=subprocess.PIPE,
+                    cwd=os.getcwd()
                 )
                 
                 # 实时输出标准输出
