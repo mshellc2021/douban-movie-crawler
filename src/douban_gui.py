@@ -246,12 +246,6 @@ class DoubanCrawlerGUI:
         # 分隔线
         ttk.Separator(status_container, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
         
-        # 当前时间区域
-        self.time_var = tk.StringVar()
-        time_label = ttk.Label(status_container, textvariable=self.time_var, 
-                             font=('Microsoft YaHei', 9), width=20)
-        time_label.pack(side=tk.LEFT, padx=5)
-        
         # 分隔线
         ttk.Separator(status_container, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
         
@@ -476,9 +470,6 @@ class DoubanCrawlerGUI:
     def update_status_bar(self):
         """更新状态栏信息"""
         try:
-            # 更新当前时间
-            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            self.time_var.set(f"🕒 {current_time}")
             
             # 更新内存使用情况（使用备用方法）- 降低更新频率
             current_time_seconds = time.time()
