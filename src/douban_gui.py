@@ -583,7 +583,7 @@ class DoubanCrawlerGUI:
             try:
                 # 使用subprocess运行爬虫（二进制模式读取，避免解码阻塞）
                 self.crawler_process = subprocess.Popen(
-                    ['python', 'douban_crawler.py'],
+                    ['python', 'src\\douban_crawler.py'],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE
                 )
@@ -707,10 +707,10 @@ class DoubanCrawlerGUI:
             
             if include_images:
                 self.log("📊 正在导出数据到Excel（包含封面图片）...", "INFO")
-                cmd = ['python', 'export_to_excel.py', '--progress']
+                cmd = ['python', 'src\\export_to_excel.py', '--progress']
             else:
                 self.log("📊 正在导出数据到Excel（仅封面链接）...", "INFO")
-                cmd = ['python', 'export_to_excel.py', '--no-images', '--progress']
+                cmd = ['python', 'src\\export_to_excel.py', '--no-images', '--progress']
             
             # 在新线程中运行导出进程
             threading.Thread(target=self._run_export_process, args=(cmd,), daemon=True).start()
