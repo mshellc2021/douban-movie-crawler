@@ -287,6 +287,15 @@ class DoubanCrawlerGUI:
                                     font=('Microsoft YaHei', 9), width=25)
         last_update_label.pack(side=tk.LEFT, padx=5)
         
+        # 分隔线
+        ttk.Separator(status_container, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
+        
+        # 作者信息和免责声明区域
+        author_info = "👤 作者: mshellc | 📜 免责声明: 本工具仅供学习研究使用"
+        author_label = ttk.Label(status_container, text=author_info, 
+                                font=('Microsoft YaHei', 8), foreground="#666666")
+        author_label.pack(side=tk.RIGHT, padx=5)
+        
         # 设置状态栏整体样式
         status_container.configure(relief=tk.SUNKEN)
         status_container['padding'] = 6
